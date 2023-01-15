@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="meteorit.js"></script>
+    <script src="korab.js"></script>
+    <script src="strela.js"></script>
+<!--
+      background: url("https://images.unsplash.com/photo-1465146633011-14f8e0781093?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3450&q=80"), #111111;
+-->
+
+
+
+    <style>
+
+#container {
+  animation: scroll 70s linear infinite;
+  background: url("b2.jpeg");
+
+  
+  color: #eee;
+  width: 500px;
+  height: 600px;
+  margin: auto;
+  border: 3px solid #73AD21;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+  
+}
+
+@keyframes scroll {
+   100%{
+    background-position:0px 3000px;
+  }
+}
+
+@media (prefers-reduced-motion) {
+    #container{
+    animation: scroll 200s linear infinite;
+  }
+}
+
+        #container2 {
+          width: 500px;
+          height: 500px;
+          margin: auto;
+          border: 3px solid #73AD21;
+          position: relative;
+          overflow: hidden;
+        }
+
+        </style>
+</head>
+<script>
+    var ObjektyKorabu= [];
+    var ObjektyMeteoritu = [];
+    var keyState = {};
+    let vyhra = false;
+    let prohra = false;
+    let idInterval;
+    let countStart = 0;
+
+
+    function zobrazKorab(){
+        const boxWrapper = document.getElementById("container");
+        width = 30;
+        height=10;
+        var y = Math.floor(boxWrapper.clientHeight - 40);
+        var x = Math.floor(boxWrapper.clientWidth/2);
+        let nameDiv = 'korab';
+        korabX = new Korab(width,height,x,y,nameDiv,'green');
+        ObjektyKorabu.push(korabX);
+    }
+
+
+    function zobrazMeteorit(){
+        const boxWrapper = document.getElementById("container");
+        const widthE=40;
+        const heightE=30;
+        const wrapperW = boxWrapper.clientWidth;
+        const wrapperH = boxWrapper.clientHeight;
+        const countMeteorits = 4;
+
+        for(i=0;i<countMeteorits;i++){
+            randomSpeed = Math.floor(Math.random() * 3)+1;
+            randomX = Math.floor(Math.random() * (boxWrapper.clientWidth - (widthE + 4)))+2;
+            randomY = Math.floor(Math.random() * (Math.floor(wrapperH /3)));
+        
+            meteoritX = new Meteorit(widthE,heightE,randomX,randomY,'red',randomSpeed);
+            ObjektyMeteoritu.push(meteoritX);
+        }
+    }
+
+
+
+    function vystrel(){
+        ObjektyKorabu[0].vystrel();
+    }
+
+
+    document.onkeydown = checkKey;
+
+    function checkKey(e) {
+
+        e = e || window.event;
+        if (e.keyCode == '70') {
+            vystrel();
+        }
+    }
+
+
+function updateGame(){
+
+    let zasah = false;
+
+    if (keyState[37] || keyState[65]){
+        ObjektyKorabu[0].PosunXY("L",10); 
+    }
+
+    if (keyState[39] || keyState[68]){
+        ObjektyKorabu[0].PosunXY("R",10); 
+    }
+
+    if (keyState[40] || keyState[83]){
+        ObjektyKorabu[0].PosunXY("D",10); 
+    }
+
+    if (keyState[38] || keyState[87]){
+        ObjektyKorabu[0].PosunXY("U",10); 
+    }
+
+    //-----------posunu střely----------------
+    for ( var i=0; i < ObjektyKorabu.length; i++ ) {
+            ObjektyKorabu[i].pohybStrely();
+        }
+    //-----------posunu meteorit----------------
+    for ( var i=0; i < ObjektyMeteoritu.length; i++ ) {
+        ObjektyMeteoritu[i].PosunXY();
+        }
+
+    //-----------vyhodnotím střelbu----------------
+    /*
+    for ( var i=0; i < ObjektyEnemy.length; i++ ) {
+        if(zasah==false && prohra == false){
+            let xE = ObjektyEnemy[i].positionX;
+            let yE = ObjektyEnemy[i].positionY;
+            let wE = ObjektyEnemy[i].dimensionX;
+            let hE = ObjektyEnemy[i].dimensionY;
+            let energie = ObjektyEnemy[i].energie;
+            let yKorab = ObjektyKorabu[0].positionY;
+
+            if(yE+wE > yKorab){
+                document.getElementById("container").style.backgroundImage = "url(bum.gif)"; 
+                //alert('prohral jsi');
+                zasah = true;
+                prohra = true;
+                i=10000;
+            }
+
+
+
+            if(prohra==false){
+                for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
+                    let strelaX = ObjektyKorabu[0].seznamStrel[k].positionX ;
+                    let strelaY = ObjektyKorabu[0].seznamStrel[k].positionY ;
+
+                    if(strelaY <= yE+hE && strelaY - 10 >= yE && zasah == false){
+                        if(strelaX >= xE && strelaX <= xE+wE){
+                            if(energie<2){
+                                ObjektyEnemy[i].EnemyX.style.background = "none";
+                                //ObjektyEnemy[i].EnemyX.style.width ="137px";
+                                //ObjektyEnemy[i].EnemyX.style.height ="200px";
+                                //ObjektyEnemy[i].EnemyX.style.backgroundImage = "url(ex2.gif)"; 
+                                ObjektyEnemy[i].EnemyX.remove();
+                                ObjektyEnemy.splice(i, 1);
+                            }
+                            if(energie==2){
+                                ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
+                                ObjektyEnemy[i].EnemyX.style.background = "powderblue"; 
+                                ObjektyEnemy[i].EnemyX.style.transform = 'rotate(45deg)';
+                            }
+                            if(energie>2){
+                                ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
+                                ObjektyEnemy[i].EnemyX.style.background = "powderblue"; 
+                                ObjektyEnemy[i].EnemyX.style.transform = 'rotate(18deg)';
+                            }
+
+
+                            ObjektyKorabu[0].seznamStrel[k].strelaX.remove();
+                            ObjektyKorabu[0].seznamStrel.splice(k, 1);
+                            zasah = true; 
+                            i=10000; 
+                        }
+                    }            
+                }
+            }
+            
+        }
+        
+    }
+
+    if(ObjektyEnemy.length==0 && vyhra == false){
+        alert('vyhrál jsi');
+        vyhra = true;
+    } 
+    */
+}
+
+function restartGame(){
+    //document.getElementById("container").style.backgroundImage = "none";
+    //location.reload();
+    for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
+        ObjektyKorabu[0].seznamStrel[k].strelaX.remove();
+        ObjektyKorabu[0].seznamStrel.splice(k, 1);
+    }
+        ObjektyKorabu[0].KorabX.remove();
+        ObjektyKorabu.splice(k, 1);
+
+    for ( var i=0; i < ObjektyMeteoritu.length; i++ ) {
+        ObjektyMeteoritu[i].MeteoritX.remove();
+    }
+    ObjektyMeteoritu = [];
+
+    zobrazKorab();
+    zobrazMeteorit();
+    vyhra = false;
+    prohra = false;
+
+}
+
+
+function startGame() {
+    //restartGame();
+    //zobrazKorab();
+
+    window.addEventListener('keydown',function(e){
+        keyState[e.keyCode || e.which] = true;
+    },true);
+
+    window.addEventListener('keyup',function(e){
+        keyState[e.keyCode || e.which] = false;
+    },true);
+
+
+
+
+    countStart ++;
+    if (countStart>1){
+        restartGame();
+        clearInterval(idInterval);
+        idInterval = setInterval(updateGame, 20);
+        return;
+    }
+
+
+    zobrazMeteorit();
+    idInterval = setInterval(updateGame, 20);
+}
+
+
+
+</script>
+
+
+
+
+<body onload="zobrazKorab()">
+    <button onclick="restartGame()">Restart</button>    
+    <button onclick="startGame()">START</button>
+    <br>
+    <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je mezerníkem</a>
+    <div id="container" >
+
+    </div>
+</body>
+</html>
