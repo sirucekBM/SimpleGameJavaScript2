@@ -4,8 +4,10 @@ class Meteorit {
       this.container = document.getElementById("container");
       this.dimensionX = dimensionX;
       this.dimensionY = dimensionY;
-      this.positionX = positionX;
-      this.positionY = positionY;
+      this.positionX = 0;
+      this.positionY = 0;
+      this.relativeX = positionX;
+      this.relativeY = positionY;
       this.color=color;
       this.energie = 3;
       this.speed = speed;
@@ -26,24 +28,24 @@ class Meteorit {
 
             PosunXY(){
 
-                this.positionY= this.positionY + this.speed;
+                this.relativeY = this.relativeY + this.speed;
 
-                if(this.positionX + this.dimensionX  > this.container.clientWidth)this.positionX = this.container.clientWidth - this.dimensionX -1;
-                if(this.positionX  < 2 )this.positionX = 2;
+                if(this.relativeX + this.dimensionX  > this.container.clientWidth)this.relativeX  = this.container.clientWidth - this.dimensionX -1;
+                if(this.relativeX   < 2 )this.relativeX  = 2;
 
-                if(this.positionY + this.dimensionY  > this.container.clientHeight + this.dimensionY ){
-                  this.positionY = -20;
+                if(this.relativeY  + this.dimensionY  > this.container.clientHeight + this.dimensionY ){
+                  this.relativeY  = -20;
                   randomSpeed = Math.floor(Math.random() * 3)+1;
                   randomX = Math.floor(Math.random() * (this.container.clientWidth - (this.dimensionX + 4)))+2;
-                  this.positionX = randomX ;
+                  this.relativeX = randomX ;
                   this.speed = randomSpeed;
-                  this.MeteoritX .style.left = this.positionX + 'px';
+
+                  this.MeteoritX.style.transform = "translate(" + this.relativeX + "px," + this.relativeY + "px)";
                   
                 }
-                //this.MeteoritX.style.transform = "translate(" + this.positionX + "px," + this.positionY + "px)";
-                this.MeteoritX .style.top = this.positionY + 'px';
-                
+                this.MeteoritX.style.transform = "translate(" + this.relativeX+ "px," + this.relativeY + "px)";
 
+              
             }
  
   }

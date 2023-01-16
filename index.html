@@ -67,6 +67,10 @@
     let prohra = false;
     let idInterval;
     let countStart = 0;
+    const FRAME_RATE = 50;
+    var intervalTime = 1000/FRAME_RATE;
+
+    let counterSpodek = 0;
 
 
     function zobrazKorab(){
@@ -120,31 +124,62 @@
 function updateGame(){
 
     let zasah = false;
+    let rychlostKorabu = 10;
 
     if (keyState[37] || keyState[65]){
-        ObjektyKorabu[0].PosunXY("L",10); 
+        ObjektyKorabu[0].PosunXY("L",rychlostKorabu); 
     }
 
     if (keyState[39] || keyState[68]){
-        ObjektyKorabu[0].PosunXY("R",10); 
+        ObjektyKorabu[0].PosunXY("R",rychlostKorabu); 
     }
 
     if (keyState[40] || keyState[83]){
-        ObjektyKorabu[0].PosunXY("D",10); 
+        ObjektyKorabu[0].PosunXY("D",rychlostKorabu); 
     }
 
     if (keyState[38] || keyState[87]){
-        ObjektyKorabu[0].PosunXY("U",10); 
+        ObjektyKorabu[0].PosunXY("U",rychlostKorabu); 
     }
 
     //-----------posunu střely----------------
     for ( var i=0; i < ObjektyKorabu.length; i++ ) {
             ObjektyKorabu[i].pohybStrely();
         }
+
     //-----------posunu meteorit----------------
     for ( var i=0; i < ObjektyMeteoritu.length; i++ ) {
         ObjektyMeteoritu[i].PosunXY();
         }
+
+    //------------vyhodnotím náraz-------------- 
+    for ( var i=0; i < ObjektyKorabu.length; i++ ) {
+        let xK = ObjektyKorabu[i].relativeX;
+        let yK = ObjektyKorabu[i].relativeY;
+        let wK = ObjektyKorabu[i].dimensionX;
+        let hK = ObjektyKorabu[i].dimensionY;
+
+        for ( var e=0; e < ObjektyMeteoritu.length; e++ ) {
+            let xM = ObjektyMeteoritu[e].relativeX;
+            let yM = ObjektyMeteoritu[e].relativeY;
+            let wM = ObjektyMeteoritu[e].dimensionX;
+            let hM = ObjektyMeteoritu[e].dimensionY;
+
+            //--DETEKCE SPODNÍ HRANY METEORITU
+            if(yK <= (yM + hM) && (yK + hK) >= yM){
+                if(xK <= (xM + wM) && (xK + wK) >= xM){
+                    let counterPlusElem = document.querySelector('#detSpHr'); 
+                    counterSpodek ++; 
+                    counterPlusElem .innerHTML = counterSpodek;
+                    return;
+                }
+            }
+
+
+        }
+        
+    }
+
 
     //-----------vyhodnotím střelbu----------------
     /*
@@ -256,13 +291,15 @@ function startGame() {
     if (countStart>1){
         restartGame();
         clearInterval(idInterval);
-        idInterval = setInterval(updateGame, 20);
+        idInterval = setInterval(updateGame, intervalTime );
+
         return;
     }
 
 
     zobrazMeteorit();
-    idInterval = setInterval(updateGame, 20);
+    idInterval = setInterval(updateGame, intervalTime );
+
 }
 
 
@@ -277,6 +314,7 @@ function startGame() {
     <button onclick="startGame()">START</button>
     <br>
     <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F</a>
+    <p id="detSpHr">kolize</p>
     <div id="container" >
 
     </div>
