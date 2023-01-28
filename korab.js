@@ -12,6 +12,7 @@ class Korab {
       this.color=color;
       this.energie = 10;
       this.seznamStrel = [];
+      this.zasobnik = 100;
 
       var newDiv = document.createElement("div");
       newDiv.style.height = this.dimensionY +'px';
@@ -57,17 +58,21 @@ class Korab {
             }
 
             vystrel(){
-                let pX = this.relativeX+ (this.dimensionX/2);
-                let pY = this.relativeY-1
-                var strela = new Strela(2,10,pX,pY,'s','red');
-                this.seznamStrel.push(strela);
+                if (this.zasobnik > 0)
+                {
+                    let pX = this.relativeX+ (this.dimensionX/2);
+                    let pY = this.relativeY-1
+                    var strela = new Strela(2,10,pX,pY,'s','red');
+                    this.seznamStrel.push(strela);
+                    this.zasobnik -= 1;
+                }
             }
 
             pohybStrely(){
                 for ( var s=0; s < this.seznamStrel.length; s++ ) {
                     this.seznamStrel[s].posunY(10);
-                    if(this.seznamStrel[s].positionY < 5){
-                        this.seznamStrel[s].strelaX.remove();
+                    if(this.seznamStrel[s].relativeY < 5){
+                        this.seznamStrel[s].StrelaX.remove();
                         this.seznamStrel.splice(s, 1);
 
                     }

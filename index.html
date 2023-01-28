@@ -8,6 +8,7 @@
     <script src="meteorit.js"></script>
     <script src="korab.js"></script>
     <script src="strela.js"></script>
+    <script src="enemy.js"></script>
 <!--
       background: url("https://images.unsplash.com/photo-1465146633011-14f8e0781093?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3450&q=80"), #111111;
 -->
@@ -48,20 +49,36 @@
   }
 }
 
-        #container2 {
-          width: 500px;
-          height: 500px;
-          margin: auto;
-          border: 3px solid #73AD21;
-          position: relative;
-          overflow: hidden;
-        }
+#container2 {
+    width: 500px;
+    height: 500px;
+    margin: auto;
+    border: 3px solid #73AD21;
+    position: relative;
+    overflow: hidden;
+}
+
+
+#countKolize{
+    font-size: 1.875em;
+}
+
+#countStrela{
+    font-size: 1.875em;
+}
 
         </style>
 </head>
 <script>
+
+
+
+
+
+
     var ObjektyKorabu= [];
     var ObjektyMeteoritu = [];
+    var ObjektyEnemy = [];
     var keyState = {};
     let vyhra = false;
     let prohra = false;
@@ -69,11 +86,12 @@
     let countStart = 0;
     const FRAME_RATE = 50;
     var intervalTime = 1000/FRAME_RATE;
-
     let counterSpodek = 0;
+    let countStrel = 100;
 
 
     function zobrazKorab(){
+        updateCountStrel();
         const boxWrapper = document.getElementById("container");
         width = 30;
         height=10;
@@ -103,10 +121,43 @@
         }
     }
 
+    function zobrazEnemy(){
+        /*
+        let ns = "http://www.w3.org/2000/svg";
+        let svg = document.createElementNS(ns,"svg");
+        svg.setAttribute("width","100");
+        svg.setAttribute("height","10");
+        svg.style.backgroundColor ="white";
+        document.getElementById("container").appendChild(svg);
+        //<polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
+        */
+
+
+        
+
+
+        const boxWrapper = document.getElementById("container");
+        const widthE=40;
+        const heightE=10;
+        const wrapperW = boxWrapper.clientWidth;
+        const wrapperH = boxWrapper.clientHeight;
+        const countX = 4;
+
+        for(i=0;i<countX;i++){
+            randomSpeed = Math.floor(Math.random() * 3)+1;
+            randomX = Math.floor(Math.random() * (boxWrapper.clientWidth - (widthE + 4)))+2;
+            randomY = Math.floor(Math.random() * (Math.floor(wrapperH /3)));
+        
+            enemyX = new Enemy(widthE,heightE,randomX,randomY,'yellow',randomSpeed);
+            ObjektyEnemy.push(enemyX);
+        }
+    }
 
 
     function vystrel(){
         ObjektyKorabu[0].vystrel();
+        countStrel =ObjektyKorabu[0].zasobnik;
+
     }
 
 
@@ -117,8 +168,21 @@
         e = e || window.event;
         if (e.keyCode == '70') {
             vystrel();
+            updateCountStrel();
         }
     }
+
+
+function updateCountKolize(){
+    let counterPlusElem = document.querySelector('#countKolize'); 
+    counterSpodek ++; 
+    counterPlusElem .innerHTML = counterSpodek;
+}
+
+function updateCountStrel(){
+    let c = document.querySelector('#countStrela'); 
+    c.innerHTML = countStrel;
+}
 
 
 function updateGame(){
@@ -152,6 +216,11 @@ function updateGame(){
         ObjektyMeteoritu[i].PosunXY();
         }
 
+    //-----------posunu enemy----------------
+    for ( var i=0; i < ObjektyEnemy.length; i++ ) {
+        ObjektyEnemy[i].PosunXY();
+        }
+
     //------------vyhodnotím náraz-------------- 
     for ( var i=0; i < ObjektyKorabu.length; i++ ) {
         let xK = ObjektyKorabu[i].relativeX;
@@ -165,95 +234,85 @@ function updateGame(){
             let wM = ObjektyMeteoritu[e].dimensionX;
             let hM = ObjektyMeteoritu[e].dimensionY;
 
-            //--DETEKCE SPODNÍ HRANY METEORITU
+            //--DETEKCE HRANY METEORITU
             if(yK <= (yM + hM) && (yK + hK) >= yM){
                 if(xK <= (xM + wM) && (xK + wK) >= xM){
-                    let counterPlusElem = document.querySelector('#detSpHr'); 
-                    counterSpodek ++; 
-                    counterPlusElem .innerHTML = counterSpodek;
+                    updateCountKolize();
                     return;
                 }
             }
-
-
-        }
-        
+        }       
     }
 
 
-    //-----------vyhodnotím střelbu----------------
-    /*
+    //-----------vyhodnotím střelbu na enemy----------------
+
     for ( var i=0; i < ObjektyEnemy.length; i++ ) {
         if(zasah==false && prohra == false){
-            let xE = ObjektyEnemy[i].positionX;
-            let yE = ObjektyEnemy[i].positionY;
+            let xE = ObjektyEnemy[i].relativeX;
+            let yE = ObjektyEnemy[i].relativeY;
             let wE = ObjektyEnemy[i].dimensionX;
             let hE = ObjektyEnemy[i].dimensionY;
             let energie = ObjektyEnemy[i].energie;
-            let yKorab = ObjektyKorabu[0].positionY;
-
-            if(yE+wE > yKorab){
-                document.getElementById("container").style.backgroundImage = "url(bum.gif)"; 
-                //alert('prohral jsi');
-                zasah = true;
-                prohra = true;
-                i=10000;
-            }
-
-
 
             if(prohra==false){
                 for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
-                    let strelaX = ObjektyKorabu[0].seznamStrel[k].positionX ;
-                    let strelaY = ObjektyKorabu[0].seznamStrel[k].positionY ;
+                    let xS = ObjektyKorabu[0].seznamStrel[k].relativeX ;
+                    let yS = ObjektyKorabu[0].seznamStrel[k].relativeY ;
 
-                    if(strelaY <= yE+hE && strelaY - 10 >= yE && zasah == false){
-                        if(strelaX >= xE && strelaX <= xE+wE){
-                            if(energie<2){
-                                ObjektyEnemy[i].EnemyX.style.background = "none";
-                                //ObjektyEnemy[i].EnemyX.style.width ="137px";
-                                //ObjektyEnemy[i].EnemyX.style.height ="200px";
-                                //ObjektyEnemy[i].EnemyX.style.backgroundImage = "url(ex2.gif)"; 
+                    //--DETEKCE HRANY enemy (jestliže pozice Y střely je menší než Y spodní hrany enemy )
+                    if(yS <= (yE + hE)){
+                        if(xS <= (xE + wE) && (xS) >= xE){
+                            ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
+                            ObjektyKorabu[0].seznamStrel.splice(k, 1);
+                            ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
+
+                            if(energie<1){
                                 ObjektyEnemy[i].EnemyX.remove();
                                 ObjektyEnemy.splice(i, 1);
+                                return;
                             }
-                            if(energie==2){
-                                ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
-                                ObjektyEnemy[i].EnemyX.style.background = "powderblue"; 
-                                ObjektyEnemy[i].EnemyX.style.transform = 'rotate(45deg)';
-                            }
-                            if(energie>2){
-                                ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
-                                ObjektyEnemy[i].EnemyX.style.background = "powderblue"; 
-                                ObjektyEnemy[i].EnemyX.style.transform = 'rotate(18deg)';
-                            }
-
-
-                            ObjektyKorabu[0].seznamStrel[k].strelaX.remove();
-                            ObjektyKorabu[0].seznamStrel.splice(k, 1);
-                            zasah = true; 
-                            i=10000; 
                         }
-                    }            
+                    }
                 }
             }
-            
         }
-        
     }
 
-    if(ObjektyEnemy.length==0 && vyhra == false){
-        alert('vyhrál jsi');
-        vyhra = true;
-    } 
-    */
+    //-----------vyhodnotím střelbu na meteorit----------------
+
+    for ( var i=0; i < ObjektyMeteoritu.length; i++ ) {
+        if(zasah==false && prohra == false){
+            let xE = ObjektyMeteoritu[i].relativeX;
+            let yE =ObjektyMeteoritu[i].relativeY;
+            let wE = ObjektyMeteoritu[i].dimensionX;
+            let hE = ObjektyMeteoritu[i].dimensionY;
+
+            if(prohra==false){
+                for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
+                    let xS = ObjektyKorabu[0].seznamStrel[k].relativeX ;
+                    let yS = ObjektyKorabu[0].seznamStrel[k].relativeY ;
+
+                    //--DETEKCE HRANY meteorit (jestliže pozice Y střely je menší než Y spodní hrany enemy )
+                    if(yS <= (yE + hE)){
+                        if(xS <= (xE + wE) && (xS) >= xE){
+                            ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
+                            ObjektyKorabu[0].seznamStrel.splice(k, 1);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 function restartGame(){
     //document.getElementById("container").style.backgroundImage = "none";
     //location.reload();
     for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
-        ObjektyKorabu[0].seznamStrel[k].strelaX.remove();
+        ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
         ObjektyKorabu[0].seznamStrel.splice(k, 1);
     }
         ObjektyKorabu[0].KorabX.remove();
@@ -264,8 +323,13 @@ function restartGame(){
     }
     ObjektyMeteoritu = [];
 
+    countStrel = 100;
     zobrazKorab();
     zobrazMeteorit();
+    zobrazEnemy();
+    countStart = 0;
+    counterSpodek = -1;
+    updateCountKolize();
     vyhra = false;
     prohra = false;
 
@@ -275,6 +339,9 @@ function restartGame(){
 function startGame() {
     //restartGame();
     //zobrazKorab();
+
+
+
 
     window.addEventListener('keydown',function(e){
         keyState[e.keyCode || e.which] = true;
@@ -298,6 +365,7 @@ function startGame() {
 
 
     zobrazMeteorit();
+    zobrazEnemy();
     idInterval = setInterval(updateGame, intervalTime );
 
 }
@@ -314,7 +382,8 @@ function startGame() {
     <button onclick="startGame()">START</button>
     <br>
     <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F</a>
-    <p id="detSpHr">kolize</p>
+    <p>kolize: <span  id="countKolize"> </span></p>
+    <p>počet střel v zásobníku: <span  id="countStrela"> </span></p>
     <div id="container" >
 
     </div>

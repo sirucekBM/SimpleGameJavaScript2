@@ -2,8 +2,10 @@ class Strela{
     constructor(dimensionX,dimensionY, positionX,positionY,name,color) {
         this.dimensionX = dimensionX;
         this.dimensionY = dimensionY;
-        this.positionX = positionX;
-        this.positionY = positionY;
+        this.positionX = 0;
+        this.positionY = 0;
+        this.relativeX = positionX;
+        this.relativeY = positionY;
         console.log('pozice top střela: ' + positionY);
         this.name=name;
         this.color=color;
@@ -20,12 +22,13 @@ class Strela{
         newDiv.className = "s";
         newDiv.setAttribute("name",this.name);
         newDiv.energie = this.energie;
-        this.strelaX = newDiv;
-        container.appendChild(this.strelaX);
+        this.StrelaX = newDiv;
+        this.StrelaX.style.transform = "translate(" + this.relativeX + "px," + this.relativeY + "px)";
+        container.appendChild(this.StrelaX);
 
     }
     posunY(okolik){
-        this.positionY = this.positionY - okolik;
-        this.strelaX.style.top = this.positionY +'px';
+        this.relativeY  -= okolik;
+        this.StrelaX.style.transform = "translate(" + this.relativeX + "px," + this.relativeY + "px)";
     }
 }
