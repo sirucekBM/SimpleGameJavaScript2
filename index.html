@@ -9,6 +9,7 @@
     <script src="korab.js"></script>
     <script src="strela.js"></script>
     <script src="enemy.js"></script>
+    <script src="bonus.js"></script>
 <!--
       background: url("https://images.unsplash.com/photo-1465146633011-14f8e0781093?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3450&q=80"), #111111;
 -->
@@ -71,14 +72,10 @@
 </head>
 <script>
 
-
-
-
-
-
     var ObjektyKorabu= [];
     var ObjektyMeteoritu = [];
     var ObjektyEnemy = [];
+    var ObjektyBonusy = [];
     var keyState = {};
     let vyhra = false;
     let prohra = false;
@@ -88,6 +85,9 @@
     var intervalTime = 1000/FRAME_RATE;
     let counterSpodek = 0;
     let countStrel = 100;
+    let timeSpan =  Math.floor(Date.now() / 1000); 
+    let countBonusShow = -1;
+    let bonusVisible = false;
 
 
     function zobrazKorab(){
@@ -106,10 +106,10 @@
     function zobrazMeteorit(){
         const boxWrapper = document.getElementById("container");
         const widthE=40;
-        const heightE=30;
+        const heightE=40;
         const wrapperW = boxWrapper.clientWidth;
         const wrapperH = boxWrapper.clientHeight;
-        const countMeteorits = 4;
+        const countMeteorits = 5;
 
         for(i=0;i<countMeteorits;i++){
             randomSpeed = Math.floor(Math.random() * 3)+1;
@@ -120,6 +120,27 @@
             ObjektyMeteoritu.push(meteoritX);
         }
     }
+
+    function generujBonus(){
+        const boxWrapper = document.getElementById("container");
+        const widthE=40;
+        const heightE=40;
+        const wrapperW = boxWrapper.clientWidth - (widthE * 2);
+        const wrapperH = boxWrapper.clientHeight - (heightE * 2);
+        const countBonus = 4;
+
+        for(i=0;i<countBonus;i++){
+            randomX = Math.floor(Math.random() * (Math.floor(wrapperW)));
+            randomY = Math.floor(Math.random() * (Math.floor(wrapperH)));
+        
+            bonusX = new Bonus(widthE,heightE,randomX,randomY,'blue');
+            ObjektyBonusy.push(bonusX);
+        }
+    }
+
+
+
+
 
     function zobrazEnemy(){
         /*
@@ -160,6 +181,14 @@
 
     }
 
+    function updateBonus(naboje){
+        ObjektyKorabu[0].updateZasobnik(naboje);
+        countStrel =ObjektyKorabu[0].zasobnik;
+        bonusVisible = false;
+        updateCountStrel();
+    }
+
+
 
     document.onkeydown = checkKey;
 
@@ -184,11 +213,37 @@ function updateCountStrel(){
     c.innerHTML = countStrel;
 }
 
+function updateTimeSpan(){
+    let c = document.querySelector('#timeSpan'); 
+    c.innerHTML = Math.floor(Date.now() / 1000); 
+    timeSpan = Math.floor(Date.now() / 1000); 
+}
+
 
 function updateGame(){
 
     let zasah = false;
-    let rychlostKorabu = 10;
+    let rychlostKorabu = 5;
+    let timeNow =  Math.floor(Date.now() / 1000); 
+
+    if (timeNow > timeSpan + 7 && bonusVisible===false){
+        timeSpan = timeNow ;
+        if(ObjektyBonusy.length>0){
+            ObjektyBonusy[0].ShowBonus();
+            bonusVisible = true;
+        }
+    }
+
+    if (timeNow > timeSpan + 5 && bonusVisible===true){
+        timeSpan = timeNow ;
+        if(ObjektyBonusy.length>0){
+            ObjektyBonusy[0].BonusX.remove();
+            ObjektyBonusy.splice(0, 1);
+            bonusVisible = false;
+        }
+    }
+
+
 
     if (keyState[37] || keyState[65]){
         ObjektyKorabu[0].PosunXY("L",rychlostKorabu); 
@@ -244,6 +299,33 @@ function updateGame(){
         }       
     }
 
+
+    
+    //------------vyhodnotím náraz do bonusu-------------- 
+    for ( var i=0; i < ObjektyKorabu.length; i++ ) {
+        let xK = ObjektyKorabu[i].relativeX;
+        let yK = ObjektyKorabu[i].relativeY;
+        let wK = ObjektyKorabu[i].dimensionX;
+        let hK = ObjektyKorabu[i].dimensionY;
+
+        if(ObjektyBonusy.length>0) {
+            let xM = ObjektyBonusy[0].relativeX;
+            let yM = ObjektyBonusy[0].relativeY;
+            let wM = ObjektyBonusy[0].dimensionX;
+            let hM = ObjektyBonusy[0].dimensionY;
+
+            //--DETEKCE HRANY -
+            if(yK <= (yM + hM) && (yK + hK) >= yM){
+                if(xK <= (xM + wM) && (xK + wK) >= xM){
+                    naboje = ObjektyBonusy[0].energie;
+                    updateBonus(naboje);
+                    ObjektyBonusy[0].BonusX.remove();
+                    ObjektyBonusy.splice(0, 1);
+                    return;
+                }
+            }
+        }       
+    }
 
     //-----------vyhodnotím střelbu na enemy----------------
 
@@ -323,10 +405,17 @@ function restartGame(){
     }
     ObjektyMeteoritu = [];
 
+    for ( var i=0; i < ObjektyBonusy.length; i++ ) {
+        ObjektyBonusy[i].BonusX.remove();
+    }
+    ObjektyBonusy = [];
+
     countStrel = 100;
     zobrazKorab();
     zobrazMeteorit();
     zobrazEnemy();
+    generujBonus();
+    updateTimeSpan()
     countStart = 0;
     counterSpodek = -1;
     updateCountKolize();
@@ -366,6 +455,8 @@ function startGame() {
 
     zobrazMeteorit();
     zobrazEnemy();
+    generujBonus();
+    updateTimeSpan()
     idInterval = setInterval(updateGame, intervalTime );
 
 }
@@ -384,6 +475,7 @@ function startGame() {
     <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F</a>
     <p>kolize: <span  id="countKolize"> </span></p>
     <p>počet střel v zásobníku: <span  id="countStrela"> </span></p>
+    <p>začátek hry: <span  id="timeSpan"> </span></p>
     <div id="container" >
 
     </div>

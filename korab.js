@@ -57,6 +57,10 @@ class Korab {
 
             }
 
+            updateZasobnik(naboje){
+                this.zasobnik += naboje;
+            }
+
             vystrel(){
                 if (this.zasobnik > 0)
                 {
