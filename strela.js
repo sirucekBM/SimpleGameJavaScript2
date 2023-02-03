@@ -10,7 +10,8 @@ class Strela{
         this.name=name;
         this.color=color;
         this.energie = 10;
-        const container = document.getElementById("container");
+        //const container = document.getElementById("container");
+        this.container = boxWrapper;
         var newDiv = document.createElement("div");
         newDiv.style.height = this.dimensionY +'px';
         newDiv.style.width = this.dimensionX +'px';

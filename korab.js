@@ -1,7 +1,8 @@
 class Korab {
     constructor(dimensionX,dimensionY, positionX,positionY,name,color) {
 
-      this.container = document.getElementById("container");
+      //this.container = document.getElementById("container");
+      this.container = boxWrapper;
       this.dimensionX = dimensionX;
       this.dimensionY = dimensionY;
       this.positionX = 0;

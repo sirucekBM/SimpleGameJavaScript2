@@ -88,11 +88,12 @@
     let timeSpan =  Math.floor(Date.now() / 1000); 
     let countBonusShow = -1;
     let bonusVisible = false;
+    let boxWrapper ;
 
 
     function zobrazKorab(){
         updateCountStrel();
-        const boxWrapper = document.getElementById("container");
+        boxWrapper = document.getElementById("container");
         width = 30;
         height=10;
         var y = Math.floor(boxWrapper.clientHeight - 40);
@@ -104,7 +105,6 @@
 
 
     function zobrazMeteorit(){
-        const boxWrapper = document.getElementById("container");
         const widthE=40;
         const heightE=40;
         const wrapperW = boxWrapper.clientWidth;
@@ -122,7 +122,6 @@
     }
 
     function generujBonus(){
-        const boxWrapper = document.getElementById("container");
         const widthE=40;
         const heightE=40;
         const wrapperW = boxWrapper.clientWidth - (widthE * 2);
@@ -157,7 +156,7 @@
         
 
 
-        const boxWrapper = document.getElementById("container");
+        //const boxWrapper = document.getElementById("container");
         const widthE=40;
         const heightE=10;
         const wrapperW = boxWrapper.clientWidth;

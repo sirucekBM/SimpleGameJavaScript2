@@ -1,7 +1,8 @@
 class Enemy2 {
     constructor(dimensionX,dimensionY, positionX,positionY,color,speed) {
 
-      this.container = document.getElementById("container");
+      //this.container = document.getElementById("container");
+      this.container = boxWrapper;
       this.dimensionX = dimensionX;
       this.dimensionY = dimensionY;
       this.positionX = 0;
