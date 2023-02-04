@@ -12,6 +12,8 @@ class Enemy {
       this.color=color;
       this.energie = 3;
       this.speed = speed;
+      this.speedX = 0;
+      this.counterSmer = 0;
 
       var newDiv = document.createElement("div");
       newDiv.style.height = this.dimensionY +'px';
@@ -31,11 +33,21 @@ class Enemy {
 
                 this.relativeY = this.relativeY + this.speed;
 
+                
+                this.counterSmer +=1;
+                if (this.counterSmer > 30){
+                  this.speedX = Math.round(Math.random()) * 3-2;
+                  this.counterSmer = 0;
+                }
+                this.relativeX = this.relativeX + this.speedX;
+
+
                 if(this.relativeX + this.dimensionX  > this.container.clientWidth)this.relativeX  = this.container.clientWidth - this.dimensionX -1;
                 if(this.relativeX   < 2 )this.relativeX  = 2;
 
                 if(this.relativeY  + this.dimensionY  > this.container.clientHeight + this.dimensionY ){
                   this.relativeY  = -20;
+                  this.energie = this.energie + 3;
                   randomSpeed = Math.floor(Math.random() * 3)+1;
                   randomX = Math.floor(Math.random() * (this.container.clientWidth - (this.dimensionX + 4)))+2;
                   this.relativeX = randomX ;
