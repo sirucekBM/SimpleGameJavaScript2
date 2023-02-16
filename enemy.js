@@ -10,10 +10,11 @@ class Enemy {
       this.relativeX = positionX;
       this.relativeY = positionY;
       this.color=color;
-      this.energie = 3;
+      this.energie = 100;
       this.speed = speed;
       this.speedX = 0;
       this.counterSmer = 0;
+      this.progresBar = 100;
 
       var newDiv = document.createElement("div");
       newDiv.style.height = this.dimensionY +'px';
@@ -23,11 +24,34 @@ class Enemy {
       newDiv.style.left = this.positionX+'px';
       newDiv.style.top = this.positionY+'px';
       newDiv.style.borderRadius = '0em';
+      newDiv.style.padding = 2 +'px';
       newDiv.energie = this.energie;
       this.EnemyX = newDiv;
+
+      var newDivBar = document.createElement("div");
+      newDivBar.style.height = 90 +'%';
+      newDivBar.style.width = 100 +'%';
+      newDivBar.style.background = 'red';
+
+      newDivBar.style.borderRadius = 10 +'px';
+      newDivBar.energie = this.barEnergy;
+      this.EnemyBar = newDivBar;
+
+      this.EnemyX .appendChild(this.EnemyBar)
       this.container.appendChild(this.EnemyX );
 
     }				
+
+            UpdateProgresBar(stav){
+              let aktualProgres = this.progresBar + stav;
+              this.EnemyBar.style.width = aktualProgres +'%';
+              this.progresBar = aktualProgres;
+              this.energie = this.energie + stav;
+            }
+
+            GetEnergie(){
+                return this.energie
+            }
 
             PosunXY(){
 
@@ -47,7 +71,11 @@ class Enemy {
 
                 if(this.relativeY  + this.dimensionY  > this.container.clientHeight + this.dimensionY ){
                   this.relativeY  = -20;
-                  this.energie = this.energie + 3;
+                  this.energie = this.energie + 20;
+                  if(this.energie>100)this.energie = 100;
+                  this.EnemyBar.style.width = this.energie +'%';
+                  this.progresBar = this.energie;
+
                   randomSpeed = Math.floor(Math.random() * 3)+1;
                   randomX = Math.floor(Math.random() * (this.container.clientWidth - (this.dimensionX + 4)))+2;
                   this.relativeX = randomX ;
@@ -57,8 +85,6 @@ class Enemy {
                   
                 }
                 this.EnemyX.style.transform = "translate(" + this.relativeX+ "px," + this.relativeY + "px)";
-
-              
             }
  
   }

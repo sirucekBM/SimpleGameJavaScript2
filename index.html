@@ -68,6 +68,26 @@
     font-size: 1.875em;
 }
 
+
+
+#progressbar {
+      background-color: black;
+      border-radius: 13px; /* (height of inner div) / 2 + padding */
+      padding: 1px;
+      width: 200px;
+    }
+
+    #progress {
+       background-color: orange;
+       width: 80%; /* Adjust with JavaScript */
+       height: 10px;
+       border-radius: 10px;
+    }
+
+
+
+
+
         </style>
 </head>
 <script>
@@ -77,18 +97,18 @@
     var ObjektyEnemy = [];
     var ObjektyBonusy = [];
     var keyState = {};
-    let vyhra = false;
-    let prohra = false;
-    let idInterval;
-    let countStart = 0;
+    var vyhra = false;
+    var prohra = false;
+    var idInterval;
+    var countStart = 0;
     const FRAME_RATE = 50;
     var intervalTime = 1000/FRAME_RATE;
-    let counterSpodek = 0;
-    let countStrel = 100;
-    let timeSpan =  Math.floor(Date.now() / 1000); 
-    let countBonusShow = -1;
-    let bonusVisible = false;
-    let boxWrapper ;
+    var counterSpodek = 0;
+    var countStrel = 100;
+    var timeSpan =  Math.floor(Date.now() / 1000); 
+    var countBonusShow = -1;
+    var bonusVisible = false;
+    var boxWrapper ;
 
 
     function zobrazKorab(){
@@ -334,7 +354,7 @@ function updateGame(){
             let yE = ObjektyEnemy[i].relativeY;
             let wE = ObjektyEnemy[i].dimensionX;
             let hE = ObjektyEnemy[i].dimensionY;
-            let energie = ObjektyEnemy[i].energie;
+            let energie = ObjektyEnemy[i].GetEnergie();
 
             if(prohra==false){
                 for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
@@ -346,9 +366,9 @@ function updateGame(){
                         if(xS <= (xE + wE) && (xS) >= xE){
                             ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
                             ObjektyKorabu[0].seznamStrel.splice(k, 1);
-                            ObjektyEnemy[i].energie = ObjektyEnemy[i].energie - 1; 
+                            ObjektyEnemy[i].UpdateProgresBar(-10)
 
-                            if(energie<1){
+                            if(energie<20){
                                 ObjektyEnemy[i].EnemyX.remove();
                                 ObjektyEnemy.splice(i, 1);
                                 return;
@@ -460,7 +480,13 @@ function startGame() {
 
 }
 
-
+function plusBar()
+{
+    let bar = document.getElementById("progress");
+    let w = bar.clientWidth;
+    w=w-20;
+    bar.style.width=w +"px";
+}
 
 </script>
 
@@ -470,11 +496,20 @@ function startGame() {
 <body onload="zobrazKorab()">
     <button onclick="restartGame()">Restart</button>    
     <button onclick="startGame()">START</button>
+    <button onclick="plusBar()">BAR</button>
     <br>
     <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F</a>
     <p>kolize: <span  id="countKolize"> </span></p>
     <p>počet střel v zásobníku: <span  id="countStrela"> </span></p>
     <p>začátek hry: <span  id="timeSpan"> </span></p>
+
+
+    <div id="progressbar">
+        <div id="progress"></div>
+    </div>
+
+      <progress value="70" max="100">75%</progress>
+
     <div id="container" >
 
     </div>
