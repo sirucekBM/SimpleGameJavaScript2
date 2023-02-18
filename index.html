@@ -251,13 +251,24 @@ function resetCountEnemy(count){
 
 function updateCountEnemy(){
     let c = document.querySelector('#countEnemy'); 
-    c.innerHTML = c.innerHTML - 1;   
+    let count = Number(c.innerHTML)
+    c.innerHTML = count - 1; 
+    if(count - 1==0){
+        setNextLevel();
+    }
 }
 
 function updateCountScore(s){
     let c = document.querySelector('#countScore'); 
     let count = Number(c.innerHTML)
     c.innerHTML = count + s;   
+}
+
+
+function updateLevel(){
+    let c = document.querySelector('#countLevel'); 
+    let count = Number(c.innerHTML)
+    c.innerHTML = count +1;   
 }
 
 function resetScore(){
@@ -464,15 +475,18 @@ function updateGame(){
 
 }
 
-function restartGame(){
+function restartGame(level){
     //document.getElementById("container").style.backgroundImage = "none";
     //location.reload();
+
+
+
     for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
         ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
         ObjektyKorabu[0].seznamStrel.splice(k, 1);
     }
         ObjektyKorabu[0].KorabX.remove();
-        ObjektyKorabu.splice(k, 1);
+        ObjektyKorabu = [];
 
     for ( var i=0; i < ObjektyMeteoritu.length; i++ ) {
         ObjektyMeteoritu[i].MeteoritX.remove();
@@ -503,15 +517,36 @@ function restartGame(){
     updateCountKolize();
     updateProgresLive(100);
     resetCountEnemy(startCountEnemy);
-    resetScore();
     vyhra = false;
     prohra = false;
+
+    
 
 }
 
 
-function SetNextLevel(){
+function setNextLevel(){
+
+
+    if(idInterval != null){
+        clearInterval(idInterval)
+    }
     
+    startCountEnemy += 1;
+    alert("Vyhrál jsi a pokračuješ do dalšího kola");
+    updateLevel();
+    restartGame(startCountEnemy);
+
+    window.addEventListener('keydown',function(e){
+        keyState[e.keyCode || e.which] = true;
+    },true);
+
+    window.addEventListener('keyup',function(e){
+        keyState[e.keyCode || e.which] = false;
+    },true);
+
+
+    idInterval = setInterval(updateGame, intervalTime );
 }
 
 
@@ -532,7 +567,9 @@ function startGame() {
         clearInterval(idInterval)
     }
 
-    restartGame();
+    startCountEnemy = 4;
+    restartGame(1);
+    resetScore();
     idInterval = setInterval(updateGame, intervalTime );
 
 }
