@@ -6,7 +6,6 @@ class Strela{
         this.positionY = 0;
         this.relativeX = positionX;
         this.relativeY = positionY;
-        console.log('pozice top střela: ' + positionY);
         this.name=name;
         this.color=color;
         this.energie = 10;

@@ -197,7 +197,7 @@
         const countX = startCountEnemy;
 
         for(i=0;i<countX;i++){
-            randomSpeed = Math.floor(Math.random() * 3)+1;
+            randomSpeed = Math.floor(Math.random() * 1)+1;
             randomX = Math.floor(Math.random() * (boxWrapper.clientWidth - (widthE + 4)))+2;
             randomY = Math.floor(Math.random() * (Math.floor(wrapperH /3)));
         
@@ -282,6 +282,17 @@ function updateTimeSpan(){
 
 
 function updateGame(){
+
+
+
+    window.addEventListener('keydown',function(e){
+        keyState[e.keyCode || e.which] = true;
+    },true);
+
+    window.addEventListener('keyup',function(e){
+        keyState[e.keyCode || e.which] = false;
+    },true);
+
 
     let zasah = false;
     let rychlostKorabu = 5;
@@ -479,7 +490,7 @@ function restartGame(level){
     //document.getElementById("container").style.backgroundImage = "none";
     //location.reload();
 
-
+    keyState = {};
 
     for( var k = 0; k<ObjektyKorabu[0].seznamStrel.length; k++){
         ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
@@ -537,13 +548,6 @@ function setNextLevel(){
     updateLevel();
     restartGame(startCountEnemy);
 
-    window.addEventListener('keydown',function(e){
-        keyState[e.keyCode || e.which] = true;
-    },true);
-
-    window.addEventListener('keyup',function(e){
-        keyState[e.keyCode || e.which] = false;
-    },true);
 
 
     idInterval = setInterval(updateGame, intervalTime );

@@ -76,7 +76,7 @@ class Enemy {
                   this.EnemyBar.style.width = this.energie +'%';
                   this.progresBar = this.energie;
 
-                  randomSpeed = Math.floor(Math.random() * 3)+1;
+                  randomSpeed = Math.floor(Math.random() * 1)+1;
                   randomX = Math.floor(Math.random() * (this.container.clientWidth - (this.dimensionX + 4)))+2;
                   this.relativeX = randomX ;
                   this.speed = randomSpeed;

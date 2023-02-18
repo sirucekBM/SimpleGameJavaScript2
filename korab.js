@@ -36,10 +36,10 @@ class Korab {
 
             PosunXY(kam, okolik){
                 
-                console.log('pozice korábu: ' +this.relativeY);
-                console.log('boxWraper: ' + this.container.clientWidth);
-                console.log('boxWraper offset: ' + this.container.offsetWidth);
-                console.log('objekt left: ' + this.relativeX);
+                //onsole.log('pozice korábu: ' +this.relativeY);
+                //console.log('boxWraper: ' + this.container.clientWidth);
+                //console.log('boxWraper offset: ' + this.container.offsetWidth);
+                //console.log('objekt left: ' + this.relativeX);
 
                 if(kam=="L")this.relativeX = this.relativeX - okolik;
                 if(kam=="R")this.relativeX = this.relativeX + okolik;
@@ -91,7 +91,7 @@ class Korab {
             }
 
             getStav() {
-              console.log(`Obj stav: ${this.newDiv}`);
+              //console.log(`Obj stav: ${this.newDiv}`);
             };
             
   }
