@@ -38,6 +38,15 @@
   
 }
 
+#gameArea{
+  width: 500px;
+  height: 100%;
+  margin: auto;
+  border: 3px solid #73AD21;
+  position: relative;
+  padding: 10px;
+}
+
 @keyframes scroll {
    100%{
     background-position:0px 3000px;
@@ -61,25 +70,42 @@
 
 
 #countKolize{
-    font-size: 1.875em;
+    font-size: 1.1em;
 }
 
 #countStrela{
     font-size: 1.875em;
+    margin-right: 20px;
 }
 
+#countEnemy{
+    font-size: 1.875em;
+}
 
+#countScore{
+    font-size: 1.875em;
+}
 
+#countLevel{
+    margin-right: 20px;
+    font-size: 1.875em;
+}
+
+#zivot{
+    width: 500px;
+    text-align: center; 
+}
 #progressbar {
       background-color: black;
       border-radius: 13px; /* (height of inner div) / 2 + padding */
       padding: 1px;
       width: 200px;
+      margin: auto;
     }
 
     #progress {
        background-color: orange;
-       width: 80%; /* Adjust with JavaScript */
+       width: 100%; /* Adjust with JavaScript */
        height: 10px;
        border-radius: 10px;
     }
@@ -109,6 +135,7 @@
     var countBonusShow = -1;
     var bonusVisible = false;
     var boxWrapper ;
+    var startCountEnemy = 4;
 
 
     function zobrazKorab(){
@@ -162,26 +189,12 @@
 
 
     function zobrazEnemy(){
-        /*
-        let ns = "http://www.w3.org/2000/svg";
-        let svg = document.createElementNS(ns,"svg");
-        svg.setAttribute("width","100");
-        svg.setAttribute("height","10");
-        svg.style.backgroundColor ="white";
-        document.getElementById("container").appendChild(svg);
-        //<polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
-        */
 
-
-        
-
-
-        //const boxWrapper = document.getElementById("container");
         const widthE=40;
         const heightE=10;
         const wrapperW = boxWrapper.clientWidth;
         const wrapperH = boxWrapper.clientHeight;
-        const countX = 4;
+        const countX = startCountEnemy;
 
         for(i=0;i<countX;i++){
             randomSpeed = Math.floor(Math.random() * 3)+1;
@@ -222,9 +235,7 @@
 
 
 function updateCountKolize(){
-    let counterPlusElem = document.querySelector('#countKolize'); 
-    counterSpodek ++; 
-    counterPlusElem .innerHTML = counterSpodek;
+
 }
 
 function updateCountStrel(){
@@ -232,9 +243,29 @@ function updateCountStrel(){
     c.innerHTML = countStrel;
 }
 
-function updateTimeSpan(){
-    let c = document.querySelector('#timeSpan'); 
-    c.innerHTML = Math.floor(Date.now() / 1000); 
+
+function resetCountEnemy(count){
+    let c = document.querySelector('#countEnemy'); 
+    c.innerHTML = count;   
+}
+
+function updateCountEnemy(){
+    let c = document.querySelector('#countEnemy'); 
+    c.innerHTML = c.innerHTML - 1;   
+}
+
+function updateCountScore(s){
+    let c = document.querySelector('#countScore'); 
+    let count = Number(c.innerHTML)
+    c.innerHTML = count + s;   
+}
+
+function resetScore(){
+    let c = document.querySelector('#countScore'); 
+    c.innerHTML = 0;   
+}
+
+function updateTimeSpan(){ 
     timeSpan = Math.floor(Date.now() / 1000); 
 }
 
@@ -312,14 +343,13 @@ function updateGame(){
             if(yK <= (yM + hM) && (yK + hK) >= yM){
                 if(xK <= (xM + wM) && (xK + wK) >= xM){
                     updateCountKolize();
+                    updateProgresLive(-5);
                     return;
                 }
             }
         }       
     }
 
-
-    
     //------------vyhodnotím náraz do bonusu-------------- 
     for ( var i=0; i < ObjektyKorabu.length; i++ ) {
         let xK = ObjektyKorabu[i].relativeX;
@@ -346,8 +376,31 @@ function updateGame(){
         }       
     }
 
-    //-----------vyhodnotím střelbu na enemy----------------
 
+    //------------vyhodnotím náraz do enemy------------- 
+    for ( var i=0; i < ObjektyKorabu.length; i++ ) {
+        let xK = ObjektyKorabu[i].relativeX;
+        let yK = ObjektyKorabu[i].relativeY;
+        let wK = ObjektyKorabu[i].dimensionX;
+        let hK = ObjektyKorabu[i].dimensionY;
+
+        for ( var e=0; e < ObjektyEnemy.length; e++ ) {
+            let xM = ObjektyEnemy[e].relativeX;
+            let yM = ObjektyEnemy[e].relativeY;
+            let wM = ObjektyEnemy[e].dimensionX;
+            let hM = ObjektyEnemy[e].dimensionY;
+
+            //--DETEKCE HRANY -
+            if(yK <= (yM + hM) && (yK + hK) >= yM){
+                if(xK <= (xM + wM) && (xK + wK) >= xM){
+                    updateProgresLive(-5);
+                    return;
+                }
+            }
+        }    
+    }
+
+    //-----------vyhodnotím střelbu na enemy----------------
     for ( var i=0; i < ObjektyEnemy.length; i++ ) {
         if(zasah==false && prohra == false){
             let xE = ObjektyEnemy[i].relativeX;
@@ -367,10 +420,12 @@ function updateGame(){
                             ObjektyKorabu[0].seznamStrel[k].StrelaX.remove();
                             ObjektyKorabu[0].seznamStrel.splice(k, 1);
                             ObjektyEnemy[i].UpdateProgresBar(-10)
+                            updateCountScore(10);
 
                             if(energie<20){
                                 ObjektyEnemy[i].EnemyX.remove();
                                 ObjektyEnemy.splice(i, 1);
+                                updateCountEnemy();
                                 return;
                             }
                         }
@@ -429,6 +484,14 @@ function restartGame(){
     }
     ObjektyBonusy = [];
 
+    for ( var i=0; i < ObjektyEnemy.length; i++ ) {
+        ObjektyEnemy[i].EnemyX.remove();
+    }
+    ObjektyEnemy = [];
+
+
+
+
     countStrel = 100;
     zobrazKorab();
     zobrazMeteorit();
@@ -438,18 +501,23 @@ function restartGame(){
     countStart = 0;
     counterSpodek = -1;
     updateCountKolize();
+    updateProgresLive(100);
+    resetCountEnemy(startCountEnemy);
+    resetScore();
     vyhra = false;
     prohra = false;
 
 }
 
 
+function SetNextLevel(){
+    
+}
+
+
+
+
 function startGame() {
-    //restartGame();
-    //zobrazKorab();
-
-
-
 
     window.addEventListener('keydown',function(e){
         keyState[e.keyCode || e.which] = true;
@@ -460,32 +528,30 @@ function startGame() {
     },true);
 
 
-
-
-    countStart ++;
-    if (countStart>1){
-        restartGame();
-        clearInterval(idInterval);
-        idInterval = setInterval(updateGame, intervalTime );
-
-        return;
+    if(idInterval != null){
+        clearInterval(idInterval)
     }
 
-
-    zobrazMeteorit();
-    zobrazEnemy();
-    generujBonus();
-    updateTimeSpan()
+    restartGame();
     idInterval = setInterval(updateGame, intervalTime );
 
 }
 
-function plusBar()
+function updateProgresLive(live)
 {
     let bar = document.getElementById("progress");
+    let containerBar = document.getElementById("progressbar");
     let w = bar.clientWidth;
-    w=w-20;
+    w=w + live;
+    if(w > containerBar.clientWidth-2)w=containerBar.clientWidth-2;
+    if(live === 100)w=containerBar.clientWidth-2;
+
     bar.style.width=w +"px";
+    if (w<0){
+        clearInterval(idInterval);
+        alert("Prohrál jsi") ;
+    }
+
 }
 
 </script>
@@ -494,24 +560,23 @@ function plusBar()
 
 
 <body onload="zobrazKorab()">
-    <button onclick="restartGame()">Restart</button>    
-    <button onclick="startGame()">START</button>
-    <button onclick="plusBar()">BAR</button>
-    <br>
-    <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F</a>
-    <p>kolize: <span  id="countKolize"> </span></p>
-    <p>počet střel v zásobníku: <span  id="countStrela"> </span></p>
-    <p>začátek hry: <span  id="timeSpan"> </span></p>
+    <div id="gameArea">
+        <div id="btnStart">
+            <button onclick="startGame()">START</button>
+        </div>
 
-
-    <div id="progressbar">
-        <div id="progress"></div>
-    </div>
-
-      <progress value="70" max="100">75%</progress>
-
-    <div id="container" >
-
+        <br>
+        <a>Hra se ovládá šipkami nebo(A,W,S,D) a výstřel je klávesou F. Úkolem je sestřelit všechny žluté objekty.
+           Střely doplňuješ sebráním modrého kola. Život ti ubírá kolize s objekty</a>
+        <p>LEVEL: <span  id="countLevel">1</span> SCORE: <span  id="countScore">0</p>
+        <p>počet střel v zásobníku: <span  id="countStrela"> </span> počet nepřátel: <span  id="countEnemy"> </span> </p>
+        <div id="zivot">Tvůj život: 
+            <div id="progressbar">
+                <div id="progress"></div>
+            </div>
+        </div>
+        
+        <div id="container" ></div>
     </div>
 </body>
 </html>
