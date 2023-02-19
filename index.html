@@ -276,6 +276,13 @@ function resetScore(){
     c.innerHTML = 0;   
 }
 
+
+function resetLevel(){
+    let c = document.querySelector('#countLevel'); 
+    c.innerHTML = 1;   
+}
+
+
 function updateTimeSpan(){ 
     timeSpan = Math.floor(Date.now() / 1000); 
 }
@@ -572,6 +579,7 @@ function startGame() {
     }
 
     startCountEnemy = 4;
+    resetLevel()
     restartGame(1);
     resetScore();
     idInterval = setInterval(updateGame, intervalTime );
